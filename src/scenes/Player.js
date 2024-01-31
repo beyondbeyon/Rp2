@@ -38,8 +38,9 @@ class Player extends Phaser.Scene {
       }
       if (Phaser.Input.Keyboard.JustDown(keyRIGHT)) {
         // 2-player mode
+        game.settings.twoplayers = true
         this.sound.play('sfx_select');
-        this.scene.start("twoplayScene");    
+        this.scene.start("playScene");    
       }
     }
 }
