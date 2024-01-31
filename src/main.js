@@ -1,8 +1,7 @@
 //Bryon Anderson
 //rocket patrol 2: - more buddy more cop
 //attempted mods: Create a new enemy Spaceship type (w/ new artwork) that's smaller, moves faster, and is worth more points (5)
-//Implement an alternating two-player mode (5) note: alternate player mode didn't end up working. I tried a flag progamming approach
-//but was unsuccessful and tips or notes would be greatly appreatiated  }:)
+//Implement an alternating two-player mode (5) note: alternate player mode
 let config = {
     type: Phaser.CANVAS,
     width: 640,
