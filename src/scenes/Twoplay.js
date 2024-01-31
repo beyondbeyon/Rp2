@@ -89,7 +89,7 @@ class TwoPlay extends Phaser.Scene {
     update() {
         // check key input for restart / menu
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyR)) {
-            this.scene.restart();
+            this.scene.start("playScene");
         }
 
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyLEFT)) {
