@@ -52,7 +52,7 @@ class TwoPlay extends Phaser.Scene {
         });
 
         // initialize score
-        this.p2score = 0;
+        p2Score = 0;
 
         //initialize time
         this.timer = game.settings.gameTimer;
@@ -70,7 +70,7 @@ class TwoPlay extends Phaser.Scene {
             },
             fixedWidth: 100
         }
-        this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding*2, this.p2score, scoreConfig);
+        this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding*2, p2Score, scoreConfig);
 
         // GAME OVER flag
         this.gameOver = false;
@@ -79,14 +79,42 @@ class TwoPlay extends Phaser.Scene {
         scoreConfig.fixedWidth = 0;
         this.clock = this.time.delayedCall(this.timer, () => {
             this.add.text(game.config.width/2, game.config.height/2, 'GAME OVER', scoreConfig).setOrigin(0.5);
-            this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Restart or ← to Menu', scoreConfig).setOrigin(0.5);
+            if(p1Score > p2Score){
+                this.add.text(game.config.width/2, game.config.height/2 + 64, `Player 1 wins, Score:${p1Score}`, scoreConfig).setOrigin(0.5);
+            }else if(p1Score < p2Score){
+                this.add.text(game.config.width/2, game.config.height/2 + 64, `Player 2 wins, Score:${p2Score}`, scoreConfig).setOrigin(0.5);
+            }
+            //this.add.text(game.config.width/2, game.config.height/2 + 64, `Player 1 wins, Score:${p1Score}`, scoreConfig).setOrigin(0.5);
+            this.add.text(game.config.width/2, game.config.height/2 + 120, 'Press (R) to Restart or ← to Menu', scoreConfig).setOrigin(0.5);
             this.gameOver = true;
         }, null, this);
 
-        this.timeRight = this.add.text(borderUISize + borderPadding*30, borderUISize + borderPadding*2,this.clock, scoreConfig)
+        this.input.on("pointermove", (pointer, gameObjects) =>{
+            this.p2rocket.x = pointer.x;
+            console.log('move')
+
+            // Force the sprite to stay on screen
+            this.p2rocket.x = Phaser.Math.Wrap(this.p2rocket.x, 0, game.config.width);
+            this.p2rocket.y = Phaser.Math.Wrap(this.p2rocket.y, 0, game.config.height)
+        }, this);
+
+        this.input.on("pointerdown", (pointer, gameObjects) =>{
+            this.p2rocket.fire()
+        }, this)
+
+        this.explode = this.add.particles(0, 0, 'bubbles', {
+            frame: 'elec1',
+            angle: { start: 0, end: 360, steps: 32 },
+            lifespan: 1500,
+            speed: 400,
+            quantity: 32,
+            scale: { start: 0.5, end: 0 },
+            emitting: false
+        });
     }
 
     update() {
+        //p2Score = p2Score
         // check key input for restart / menu
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyR)) {
             this.scene.start("playScene");
@@ -110,17 +138,17 @@ class TwoPlay extends Phaser.Scene {
         if(this.checkCollision(this.p2rocket, this.ship03)) {
             this.p2rocket.reset();
             this.shipExplode(this.ship03);
-            this.time += 250
+            
         }
         if (this.checkCollision(this.p2rocket, this.ship02)) {
             this.p2rocket.reset();
             this.shipExplode(this.ship02);
-            this.time += 250
+            
         }
         if (this.checkCollision(this.p2rocket, this.ship01)) {
             this.p2rocket.reset();
             this.shipExplode(this.ship01);
-            this.time += 250
+            
         }
         if (this.checkCollision(this.p2rocket, this.ship04)) {
             this.p2rocket.reset();
@@ -156,9 +184,10 @@ class TwoPlay extends Phaser.Scene {
             boom.destroy();                       // remove explosion sprite
         });
         // score add and repaint
-        this.p2score += ship.points;
-        this.scoreLeft.text = this.p2score; 
+        p2Score += ship.points;
+        this.scoreLeft.text = p2Score; 
         
         this.sound.play('sfx_explosion');
-      }
+        this.explode.emitParticleAt(ship.x, ship.y);
+    }
 }
